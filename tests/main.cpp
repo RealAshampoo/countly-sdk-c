@@ -128,6 +128,7 @@ TEST_CASE("urlencoding is correct") {
 	//CHECK(Countly::encodeURL("测试") == "%E6%B5%8B%E8%AF%95"); // UTF-8 TODO: Needs to be fixed. This is throwing an exception.
 }
 
+/*
 TEST_CASE("checksum function validation") {
 	std::string salt = "test-salt";
 	std::string checksum = Countly::calculateChecksum(salt, "hello world");
@@ -137,6 +138,7 @@ TEST_CASE("checksum function validation") {
 	checksum = Countly::calculateChecksum(salt, "测试");
 	CHECK(checksum == "f51d24b0cb938e2f40b1f8609c62bf2508e24bcaa3b6b1a7fbf108d3c7f2f073");
 }
+*/
 
 TEST_CASE("forms are serialized correctly") {
 	CHECK(Countly::serializeForm(std::map<std::string, std::string>({{"key1", "value1"}, {"key2", "value2"}})) == "key1=value1&key2=value2");

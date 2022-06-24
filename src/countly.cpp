@@ -6,7 +6,7 @@
 #include <iostream>
 #include <system_error>
 
-#include "openssl/sha.h"
+//#include "openssl/sha.h"
 
 #include "countly.hpp"
 
@@ -68,12 +68,12 @@ void Countly::alwaysUsePost(bool value) {
 	always_use_post = value;
 	mutex.unlock();
 }
-
+/*
 void Countly::setSalt(const std::string& value) {
 	mutex.lock();
 	salt = value;
 	mutex.unlock();
-}
+}*/
 
 void Countly::setLogger(void (*fun)(Countly::LogLevel level, const std::string& message)) {
 	mutex.lock();
@@ -809,6 +809,7 @@ static size_t countly_curl_write_callback(void *data, size_t byte_size, size_t n
 	return data_size;
 }
 
+/*
 std::string Countly::calculateChecksum(const std::string& salt, const std::string& data) {
 	unsigned char checksum[SHA256_DIGEST_LENGTH];
 	std::string salted_data = data + salt;
@@ -826,12 +827,12 @@ std::string Countly::calculateChecksum(const std::string& salt, const std::strin
 	std::string calcualtedChecksum = checksum_stream.str();
 
 	return calcualtedChecksum;
-}
+}*/
 
 Countly::HTTPResponse Countly::sendHTTP(std::string path, std::string data) {
 	bool use_post = always_use_post || (data.size() > COUNTLY_POST_THRESHOLD);
 	log(Countly::LogLevel::DEBUG, "[Countly][sendHTTP] data: "+ data);
-	if (!salt.empty()) {
+	/*if (!salt.empty()) {
 		std::string checksum = calculateChecksum(salt, data);
 		if (!data.empty()) {
 			data += '&';
@@ -839,7 +840,7 @@ Countly::HTTPResponse Countly::sendHTTP(std::string path, std::string data) {
 
 		data += "checksum256=" + checksum;
 		log(Countly::LogLevel::DEBUG, "[Countly][sendHTTP] with checksum, data: " + data);
-	}
+	}*/
 	
 	Countly::HTTPResponse response;
 	response.success = false;

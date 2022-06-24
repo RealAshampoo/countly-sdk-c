@@ -42,7 +42,7 @@ public:
 
 	void alwaysUsePost(bool value);
 
-	void setSalt(const std::string& value);
+	//void setSalt(const std::string& value);
 
 	enum LogLevel {DEBUG, INFO, WARNING, ERROR, FATAL};
 
@@ -125,7 +125,7 @@ public:
 
 	static std::string serializeForm(const std::map<std::string, std::string> data);
 
-	static std::string calculateChecksum(const std::string& salt, const std::string& data);
+	//static std::string calculateChecksum(const std::string& salt, const std::string& data);
 
 #ifdef COUNTLY_USE_SQLITE
 	void setDatabasePath(const std::string& path);
@@ -161,8 +161,6 @@ public:
 	void SetPath(const std::string& path) {
 #ifdef COUNTLY_USE_SQLITE
 		setDatabasePath(path);
-#elif defined _WIN32
-		UNREFERENCED_PARAMETER(path);
 #endif
 	}
 
@@ -265,7 +263,7 @@ private:
 	std::chrono::system_clock::time_point last_sent_session_request;
 	
 	json session_params;
-	std::string salt;
+	//std::string salt;
 
 	std::thread *thread;
 	std::mutex mutex;

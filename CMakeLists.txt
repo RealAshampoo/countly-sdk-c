@@ -38,9 +38,9 @@ target_include_directories(countly PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/jso
 if (APPLE)
   set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
 endif()
-find_package(OpenSSL REQUIRED)
-target_include_directories(countly PRIVATE ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(countly ${OPENSSL_LIBRARIES})
+#find_package(OpenSSL REQUIRED)
+#target_include_directories(countly PRIVATE ${OPENSSL_INCLUDE_DIR})
+#target_link_libraries(countly ${OPENSSL_LIBRARIES})
 
 if(COUNTLY_USE_CUSTOM_HTTP)
   target_compile_definitions(countly PRIVATE COUNTLY_USE_CUSTOM_HTTP)
