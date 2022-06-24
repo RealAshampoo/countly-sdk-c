@@ -1,0 +1,6 @@
+EXPORTS
+	countly_c_init
+	countly_c_recordEvent
+	countly_c_recordView
+
+

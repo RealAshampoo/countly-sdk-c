@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
+cmake_policy(SET CMP0091 NEW)
 
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/countly.hpp COUNTLY_HPP_CONTENTS)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/src/countly.hpp COUNTLY_HPP_CONTENTS)
 string(REGEX MATCH "#define COUNTLY_SDK_VERSION \"[^\"]+\"" COUNTLY_SDK_VERSION ${COUNTLY_HPP_CONTENTS})
 string(REGEX REPLACE "#define COUNTLY_SDK_VERSION \"([^\"]+)\"" "\\1" COUNTLY_SDK_VERSION ${COUNTLY_SDK_VERSION})
 
-project(countly VERSION ${COUNTLY_SDK_VERSION} LANGUAGES CXX)
+project(countly VERSION ${COUNTLY_SDK_VERSION} LANGUAGES CXX C)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS  "Create a module definition (.def) on Windows." ON)
 option(COUNTLY_USE_CUSTOM_HTTP "Use a custom HTTP library" OFF)
-option(COUNTLY_USE_SQLITE "Use SQLite" OFF)
+option(COUNTLY_USE_SQLITE "Use SQLite" ON)
 option(COUNTLY_BUILD_TESTS "Build test programs" OFF)
 option(COUNTLY_BUILD_SAMPLE "Build Sample programs" OFF)
 
@@ -17,9 +17,17 @@ if (NOT WIN32 AND NOT BUILD_SHARED_LIBS AND NOT COUNTLY_USE_CUSTOM_HTTP)
   message(FATAL_ERROR "You must provide a custom HTTP function when compiling statically.")
 endif()
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS off)
+
 add_library(countly
   ${CMAKE_CURRENT_SOURCE_DIR}/src/countly.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/event.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/event.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/countly_c.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/countly_c.def
+  ${CMAKE_CURRENT_SOURCE_DIR}/vendor/sqlite/sqlite3.c)
+
+set_property(TARGET countly PROPERTY
+  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_include_directories(countly
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -52,10 +60,10 @@ endif()
 
 if(COUNTLY_USE_SQLITE)
   target_compile_definitions(countly PRIVATE COUNTLY_USE_SQLITE)
-  set(Sqlite3_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/sqlite/build)
-  find_package(Sqlite3)
+  #set(Sqlite3_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/sqlite/build)
+  #find_package(Sqlite3)
   target_include_directories(countly PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/sqlite)
-  target_link_libraries(countly sqlite3)
+  #target_link_libraries(countly sqlite3)
 endif()
 
 if(COUNTLY_BUILD_TESTS)
