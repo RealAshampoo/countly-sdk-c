@@ -2,6 +2,7 @@
 build/
 .idea/
 .vscode/
+.vs/
 .project
 
 # cmake generates these files
@@ -19,3 +20,4 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
