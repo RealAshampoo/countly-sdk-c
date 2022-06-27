@@ -197,15 +197,11 @@ public:
 	void RecordEvent(const std::string key, int count, double sum) {
 		Event ev(key, count, sum);
 
-		ev.setTimestamp();
-
 		addEvent(ev);
 	}
 
 	void RecordEvent(const std::string key, std::map<std::string, std::string> segmentation, int count) {
 		Event event(key, count);
-
-		event.setTimestamp();
 
 		for (auto key_value: segmentation) {
 			event.addSegmentation(key_value.first, key_value.second);
@@ -217,8 +213,6 @@ public:
 	void RecordEvent(const std::string key, std::map<std::string, std::string> segmentation, int count, double sum) {
 		Event event(key, count, sum);
 
-		event.setTimestamp();
-
 		for (auto key_value: segmentation) {
 			event.addSegmentation(key_value.first, key_value.second);
 		}
@@ -228,8 +222,6 @@ public:
 
 	void RecordEvent(const std::string key, std::map<std::string, std::string> segmentation, int count, double sum, double duration) {
 		Event event(key, count, sum, duration);
-
-		event.setTimestamp();
 
 		for (auto key_value: segmentation) {
 			event.addSegmentation(key_value.first, key_value.second);
