@@ -147,7 +147,7 @@ extern "C" int countly_c_recordEvent(
 		ev.addSegmentation("view", std::string(screenName));
 	}
 
-	ev.setTimestamp()
+	ev.setTimestamp();
 	
 	Countly::getInstance().addEvent(ev);
 
@@ -168,7 +168,7 @@ extern "C" int countly_c_recordScreenView(
 	initEventSegmentation(ev, segmentationParams, segmentationParamCount);
 	ev.addSegmentation("name", std::string(screenName));
 
-	ev.setTimestamp()
+	ev.setTimestamp();
 
 	Countly::getInstance().addEvent(ev);
 
