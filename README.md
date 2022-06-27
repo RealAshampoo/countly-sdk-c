@@ -24,5 +24,7 @@ Typical call order:
 - When done: flush buffered data with countly_c_flush (recommended)
   Then stop and clean up with countly_c_end.
 
+See documentation in countly_c.h for details.
+
 
 
