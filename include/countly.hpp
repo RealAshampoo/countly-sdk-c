@@ -19,7 +19,7 @@ using json = nlohmann::json;
 #undef ERROR
 #endif
 
-#define COUNTLY_SDK_NAME "cpp-native-unknown"
+#define COUNTLY_SDK_NAME "c-native-unknown"
 #define COUNTLY_SDK_VERSION "0.1.0"
 #define COUNTLY_API_VERSION "21.11.2"
 #define COUNTLY_POST_THRESHOLD 2000
