@@ -30,7 +30,8 @@ jobs:
           copy Release\countly.dll relarchive
           copy Release\countly.lib relarchive
           copy ..\include\countly_c.h relarchive
-          Compress-Archive -Path relarchive -DestinationPath countly_x64.zip
+          cd relarchive
+          Compress-Archive -Path . -DestinationPath ..\countly_x64.zip
 
       - name: Create Release
         id: create_release
