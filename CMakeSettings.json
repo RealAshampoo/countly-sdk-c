@@ -1,22 +1,32 @@
 ﻿{
-  "configurations": [
-    {
-      "name": "x64-Debug",
-      "generator": "Ninja",
-      "configurationType": "Debug",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "variables": [
+    "configurations": [
         {
-          "name": "COUNTLY_USE_SQLITE",
-          "value": "True",
-          "type": "BOOL"
+            "name": "x64-Debug",
+            "generator": "Ninja",
+            "configurationType": "Debug",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "",
+            "ctestCommandArgs": "",
+            "variables": [
+                {
+                    "name": "COUNTLY_USE_SQLITE",
+                    "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "COUNTLY_BUILD_SAMPLE",
+                    "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "COUNTLY_BUILD_TESTS",
+                    "value": "False",
+                    "type": "BOOL"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

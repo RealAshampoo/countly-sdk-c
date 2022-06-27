@@ -1,6 +1,11 @@
 EXPORTS
 	countly_c_init
+	countly_c_end
+	countly_c_setDeviceID
+	countly_c_setFlushIntervalSeconds
+	countly_c_start
 	countly_c_recordEvent
-	countly_c_recordView
+	countly_c_recordScreenView
+	countly_c_flush
 
 

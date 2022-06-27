@@ -5,16 +5,38 @@
 #endif
 
 #include <sstream>
+#include <iostream>
 
 #include <countly_c.h>
+
+void onException(std::exception& e) {
+	std::cerr << std::endl << "Countly internal exception: " << e.what() << std::endl;
+	std::cerr.flush();
+}
 
 
 #define COUNTLY_C_GUARD_BEGIN try {
 #define COUNTLY_C_GUARD_END } \
 	catch(std::exception& e) { \
-		return COUNTLY_C_ERROR_UNKNOWN; \
+		onException(e); \
+		return COUNTLY_C_GENERIC_ERROR; \
 	} \
 	return COUNTLY_C_OK;
+
+
+struct CountlyCContext {
+	std::string serverHost;
+	int 	    serverPort=0;
+	std::string appKey;
+
+	bool	    started=false;
+
+	static CountlyCContext& get() {
+		static CountlyCContext context;
+		return context;
+	}
+};
+
 
 
 extern "C" int countly_c_init(
@@ -22,11 +44,19 @@ extern "C" int countly_c_init(
 	int serverPort,
 	const char* appKey,
 	const char* appVersion,
-	int updateIntervalSeconds
+	const char* databasePath
 ) {
 	COUNTLY_C_GUARD_BEGIN
 
 	Countly& ct = Countly::getInstance();
+
+	ct.SetMaxEventsPerMessage(40);
+	ct.SetPath(databasePath);
+
+	CountlyCContext& context = CountlyCContext::get();
+	context.serverHost = serverHost;
+	context.serverPort = serverPort;
+	context.appKey = appKey;
 
 #ifdef WIN32
 	OSVERSIONINFOEX info;
@@ -52,28 +82,54 @@ extern "C" int countly_c_init(
 
 #endif
 
-	ct.SetMaxEventsPerMessage(40);
-	ct.SetMinUpdatePeriod(updateIntervalSeconds*1000);
+	COUNTLY_C_GUARD_END
+}
 
-	std::string serverProtocolAndHost = std::string("https://")+serverHost;
-	ct.Start(appKey, serverProtocolAndHost, serverPort);
+extern "C" int countly_c_setDeviceID(const char* deviceID) {
+	COUNTLY_C_GUARD_BEGIN
+
+	Countly::getInstance().setDeviceID(deviceID);
 
 	COUNTLY_C_GUARD_END
 }
 
-void initSegMap(
-	std::map<std::string, std::string>& segMap,
+extern "C" int countly_c_setFlushIntervalSeconds(int seconds) {
+	COUNTLY_C_GUARD_BEGIN
+
+	Countly::getInstance().SetMinUpdatePeriod(seconds*1000);
+
+	COUNTLY_C_GUARD_END
+}
+
+
+extern "C" int countly_c_start() {
+	COUNTLY_C_GUARD_BEGIN
+
+	CountlyCContext& context = CountlyCContext::get();
+	std::string serverProtocolAndHost = std::string("https://")+context.serverHost;
+
+	Countly::getInstance().Start(context.appKey, serverProtocolAndHost, context.serverPort);
+
+	context.started = true;
+
+	COUNTLY_C_GUARD_END
+}
+
+
+void initEventSegmentation(
+	Countly::Event& ev,
 	Countly_C_SegmentationParam* segmentationParams,
 	int segmentationParamCount) {
 
 	for(int i=0; i<segmentationParamCount; i++) {
-		segMap[ segmentationParams[i].key ] = segmentationParams[i].value;
+		ev.addSegmentation(segmentationParams[i].key, std::string(segmentationParams[i].value) );
 	}
 }
 
 
-int countly_c_recordEvent(
+extern "C" int countly_c_recordEvent(
 	const char* eventName,
+	const char* screenName,
 	Countly_C_SegmentationParam* segmentationParams,
 	int segmentationParamCount,
 	int eventCount,
@@ -81,29 +137,57 @@ int countly_c_recordEvent(
 ) {
 	COUNTLY_C_GUARD_BEGIN
 
-	std::map<std::string, std::string> segMap;
-	initSegMap(segMap, segmentationParams, segmentationParamCount);
+	if(! CountlyCContext::get().started)
+		return COUNTLY_C_NOT_STARTED;
+
+
+	Countly::Event ev(eventName, eventCount, eventAmount);
+	initEventSegmentation(ev, segmentationParams, segmentationParamCount);
+	if(screenName!=NULL && screenName[0]!=0) {
+		ev.addSegmentation("view", std::string(screenName));
+	}
 	
-	Countly& ct = Countly::getInstance();
-	ct.RecordEvent( eventName, segMap, eventCount, eventAmount);
+	Countly::getInstance().addEvent(ev);
 
 	COUNTLY_C_GUARD_END
 }
 
-int countly_c_recordView(
-	const char* viewName,
+extern "C" int countly_c_recordScreenView(
+	const char* screenName,
 	Countly_C_SegmentationParam* segmentationParams,
 	int segmentationParamCount
 ) {
 	COUNTLY_C_GUARD_BEGIN
 
-	std::map<std::string, std::string> segMap;
-	initSegMap(segMap, segmentationParams, segmentationParamCount);
+	if(! CountlyCContext::get().started)
+		return COUNTLY_C_NOT_STARTED;
 
-	segMap["name"] = viewName;
+	Countly::Event ev("[CLY]_view");
+	initEventSegmentation(ev, segmentationParams, segmentationParamCount);
+	ev.addSegmentation("name", std::string(screenName));
+
+	Countly::getInstance().addEvent(ev);
+
+	COUNTLY_C_GUARD_END
+}
+
+
+extern "C" int countly_c_flush() {
+	COUNTLY_C_GUARD_BEGIN
+
+	if(! CountlyCContext::get().started)
+		return COUNTLY_C_NOT_STARTED;
 	
-	Countly& ct = Countly::getInstance();
-	ct.RecordEvent( "[CLY]_view", segMap, 1, 0);
+	Countly::getInstance().updateSession();
+
+	COUNTLY_C_GUARD_END
+}
+
+
+extern "C" int countly_c_end() {
+	COUNTLY_C_GUARD_BEGIN
+
+	Countly::getInstance().stop();
 
 	COUNTLY_C_GUARD_END
 }

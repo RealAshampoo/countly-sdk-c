@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 cmake_policy(SET CMP0091 NEW)
 
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/src/countly.hpp COUNTLY_HPP_CONTENTS)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/countly.hpp COUNTLY_HPP_CONTENTS)
 string(REGEX MATCH "#define COUNTLY_SDK_VERSION \"[^\"]+\"" COUNTLY_SDK_VERSION ${COUNTLY_HPP_CONTENTS})
 string(REGEX REPLACE "#define COUNTLY_SDK_VERSION \"([^\"]+)\"" "\\1" COUNTLY_SDK_VERSION ${COUNTLY_SDK_VERSION})
 
@@ -87,8 +87,10 @@ if(COUNTLY_BUILD_SAMPLE)
   add_executable(countly-sample
     ${CMAKE_CURRENT_SOURCE_DIR}/examples/example_integration.cpp)
   if(COUNTLY_USE_SQLITE)
-    target_compile_definitions(countly-tests PRIVATE COUNTLY_USE_SQLITE)
-    target_include_directories(countly-tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/sqlite)
+    if(COUNTLY_BUILD_TESTS)
+        target_compile_definitions(countly-tests PRIVATE COUNTLY_USE_SQLITE)
+        target_include_directories(countly-tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/sqlite)
+    endif()
   endif()
   target_include_directories(countly-sample PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/doctest/doctest)
   target_include_directories(countly-sample PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/json/include)
