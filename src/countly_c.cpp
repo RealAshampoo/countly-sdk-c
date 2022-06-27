@@ -44,14 +44,14 @@ extern "C" int countly_c_init(
 	int serverPort,
 	const char* appKey,
 	const char* appVersion,
-	const char* databasePath
+	const char* stateFilePath
 ) {
 	COUNTLY_C_GUARD_BEGIN
 
 	Countly& ct = Countly::getInstance();
 
 	ct.SetMaxEventsPerMessage(40);
-	ct.SetPath(databasePath);
+	ct.SetPath(stateFilePath);
 
 	CountlyCContext& context = CountlyCContext::get();
 	context.serverHost = serverHost;

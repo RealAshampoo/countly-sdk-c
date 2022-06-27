@@ -25,13 +25,20 @@ extern "C" {
 */
 
 
-/** Initializes the library.*/
+/** Initializes the library.
+ * 	serverHost the host name of the Countly server to use (ONLY the host name - no protocol of path!)
+ *  serverPort port of the Countly server. Usually 443 (HTTPS). Note that HTTPS is always used!
+ *  appKey Application ID as understood by the Server.
+ *  appVersion Application version
+ *  stateFilePath a path to a file where the SDK can store its state data.
+ *  
+*/
 int countly_c_init(
 	const char* serverHost,
 	int serverPort,
 	const char* appKey,
 	const char* appVersion,
-	const char* databasePath
+	const char* stateFilePath
 );
 
 
