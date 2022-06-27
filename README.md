@@ -1,87 +1,28 @@
-# Countly C++ SDK
+# Countly C SDK
 
-![travis build status](https://img.shields.io/travis/Countly/countly-sdk-cpp?style=flat-square)
+A Countly SDK with a plain C interface.
 
-This repository contains the portable Countly C++ SDK. 
+Internally this SDK uses the Countly C++ SDK code and simply adds a C interface on top of it.
 
-## What's Countly?
+The SDK currently only supports Windows and builds a self-contained DLL without any dependencies (also no C runtime library dependencies).
+Metrics are auto-detected.
 
-[Countly](http://count.ly) is an innovative, real-time, open source mobile analytics and push notifications platform. It collects data from mobile devices, and visualizes this information to analyze mobile application usage and end-user behavior. There are two parts of Countly: [the server that collects and analyzes data](http://github.com/countly/countly-server), and mobile SDK that sends this data. Both parts are open source with different licensing terms.
 
-* **Slack user?** [Join our Slack community](http://slack.count.ly:3000/)
-* **Questions?** [Ask in our Community forum](http://community.count.ly)
+## How to use
 
-## Dependencies and building
+Include the countly_c.h header in your applications.
 
-Countly C++ SDK has been designed to work with very few dependencies in order to be available on most platforms.
-In order to build this SDK, you need:
+All functions return a result constant (COUNTLY_C_OK, COUNTLY_C_GENERIC_ERROR, COUNTLY_C_NOT_STARTED).
 
-- a C++ compiler with C++11 support
-- libcurl (with openssl) and its headers if you are on *nix
-- cmake >= 3.13
+Typical call order:
 
-First, clone the repository with its submodules:
+- Initialize with countly_c_init
+- Set device ID with countly_c_setDeviceID
+- Optional: Set flush interval with countly_c_setFlushIntervalSeconds
+- Start with countly_c_start
+- Send events and screen views with countly_c_recordEvent and countly_c_recordScreenView.
+- When done: flush buffered data with countly_c_flush (recommended)
+  Then stop and clean up with countly_c_end.
 
-``` shell
-git clone --recursive https://github.com/Countly/countly-sdk-cpp
-```
 
-If you want to use SQLite to store session data persistently, build sqlite:
-
-``` shell
-# assuming we are on project root
-cd vendor/sqlite
-cmake -D BUILD_SHARED_LIBS=1 -B build . # out of source build, we don't like clutter :)
-# we define `BUILD_SHARED_LIBS` because sqlite's cmake file compiles statically by default for some reason
-cd build
-make # you might want to add something like -j8 to parallelize the build process
-```
-
-The cmake build flow is pretty straightforward:
-
-``` shell
-# assuming we are on project root again
-ccmake -B build . # this will launch a TUI, configure the build as you see fit
-cd build
-make
-```
-
-## Usage
-
-Typical use is:
-
-```C++
-#include "countly.hpp"
-
-int main(int argc, char *argv[]) {
-	Countly& ct = Countly::getInstance();
-	// OS, OS_version, device, resolution, carrier, app_version);
-	ct.SetMetrics("Windows 10", "10.22", "Mac", "800x600", "Carrier", "1.0");
-	ct.SetCustomUserDetails({{"Account Type", "Basic"}, {"Employer", "Company4"}});
-	// Server and port
-	ct.Start("abf2034f975393fa994d1cf8adf9a93e4a29ac29", "https://myserver.com", 403);
-	ct.SetMaxEventsPerMessage(40);
-	ct.SetMinUpdatePeriod(2000);
-
-	ct.RecordEvent("MyCustomEvent", 123);
-	ct.RecordEvent("MyCustomEvent", 17);
-	ct.RecordEvent("MyCustomEvent", 34);
-	ct.RecordEvent("AnotherCustomEvent", 644, 13.3);
-
-	// Your program is supposed to do something..
-
-	return 0;
-}
-```
-
-## Testing
-
-Build with the option `COUNTLY_BUILD_TESTS` on to build an executable that will run the tests:
-
-``` shell
-cmake -D COUNTLY_BUILD_TESTS=1 -B build . # or do it interactively with ccmake
-cd build
-make
-./countly-tests
-```
 
