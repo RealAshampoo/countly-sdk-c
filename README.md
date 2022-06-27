@@ -11,6 +11,8 @@ Countly metrics are auto-detected when init is called.
 
 ## How to use
 
+Download the [Latest Release](https://github.com/RealAshampoo/countly-sdk-c/releases/latest/download/countly_x64.zip).
+
 Include the countly_c.h header in your application and link to the import library countly_c.lib
 (or load the DLL dynamically if that is more convenient in your context).
 
