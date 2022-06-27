@@ -2,17 +2,20 @@
 
 A Countly SDK with a plain C interface.
 
-Internally this SDK uses the Countly C++ SDK code and simply adds a C interface on top of it.
+Internally, this SDK uses the Countly C++ SDK code and simply adds a C interface on top of it.
 
-The SDK currently only supports Windows and builds a self-contained DLL without any dependencies (also no C runtime library dependencies).
-Metrics are auto-detected.
+The SDK currently only supports Windows and builds a self-contained DLL without any dependencies (also no external CRT dependencies).
+
+Countly metrics are auto-detected when init is called.
 
 
 ## How to use
 
-Include the countly_c.h header in your applications.
+Include the countly_c.h header in your application and link to the import library countly_c.lib
+(or load the DLL dynamically if that is more convenient in your context).
 
-All functions return a result constant (COUNTLY_C_OK, COUNTLY_C_GENERIC_ERROR, COUNTLY_C_NOT_STARTED).
+All functions return an integer result constant (COUNTLY_C_OK, COUNTLY_C_GENERIC_ERROR, COUNTLY_C_NOT_STARTED)
+to indicate success or failure.
 
 Typical call order:
 
