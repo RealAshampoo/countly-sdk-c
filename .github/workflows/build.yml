@@ -15,12 +15,12 @@ jobs:
     uses: ./.github/workflows/build_assets_for_arch.yml
     with:
       arch: x64
-      release_upload_url: {{ steps.prepare_arch_independent.outputs.release_upload_url }}
+      release_upload_url: {{ needs.prepare_arch_independent.outputs.release_upload_url }}
 
   create_release_asset_x86:
     needs: prepare_arch_independent
     uses: ./.github/workflows/build_assets_for_arch.yml
     with:
       arch: x86
-      release_upload_url: {{ steps.prepare_arch_independent.outputs.release_upload_url }}
+      release_upload_url: {{ needs.prepare_arch_independent.outputs.release_upload_url }}
 
