@@ -6,6 +6,7 @@ on:
 jobs:
   prepare_arch_independent:
     name: Create GitHub Release
+    runs-on: ubuntu-latest
     steps:
       - name: Create Github Release
         id: create_github_release
