@@ -2,7 +2,7 @@ name: Workflow for general preparation
 on:
   workflow_call:
     outputs:
-      release_upload_url: ${{ steps.create_github_release.outputs.upload_url }}
+      release_upload_url: ${{ jobs.prepare_arch_independent.outputs.release_upload_url }}
   
 
 jobs:
@@ -22,4 +22,6 @@ jobs:
             Automated Release by GitHub Action CI
           draft: false
           prerelease: true
+    outputs:
+      release_upload_url: ${{ steps.create_github_release.outputs.upload_url }}
 
