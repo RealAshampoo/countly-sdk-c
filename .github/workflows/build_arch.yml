@@ -8,7 +8,7 @@ on:
 
 jobs:
   create_arch_release:
-    name: Create GitHub Release
+    name: Create GitHub Release ${{ inputs.arch }}
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +19,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake -DCMAKE_GENERATOR_PLATFORM=${{ inputs.arch }} ..
 
       - name: Build project
         working-directory: build
@@ -48,14 +48,14 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Upload Release Asset (x64)
-        id: upload-release-asset-x64
+      - name: Upload Release Asset (${{ inputs.arch }})
+        id: upload-release-asset-${{ inputs.arch }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/countly_x64.zip
-          asset_name: countly_x64.zip
+          asset_path: build/countly_${{ inputs.arch }}.zip
+          asset_name: countly_${{ inputs.arch }}.zip
           asset_content_type: application/zip
 
