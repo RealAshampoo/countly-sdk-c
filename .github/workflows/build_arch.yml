@@ -1,0 +1,61 @@
+name: Countly C SDK Build Workflow for a single architecture
+on:
+  workflow_call:
+    inputs:
+      arch:
+        required: true
+        type: string
+
+jobs:
+  create_arch_release:
+    name: Create GitHub Release
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      
+      - name: Generate project files
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+
+      - name: Build project
+        working-directory: build
+        run: cmake --build . --config Release
+
+      - name: Create release archive
+        working-directory: build
+        run: |
+          mkdir relarchive
+          copy Release\countly.dll relarchive
+          copy Release\countly.lib relarchive
+          copy ..\include\countly_c.h relarchive
+          cd relarchive
+          Compress-Archive -Path . -DestinationPath ..\countly_x64.zip
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Automated Release by GitHub Action CI
+          draft: false
+          prerelease: true
+
+      - name: Upload Release Asset (x64)
+        id: upload-release-asset-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/countly_x64.zip
+          asset_name: countly_x64.zip
+          asset_content_type: application/zip
+
