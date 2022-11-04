@@ -19,7 +19,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_GENERATOR_PLATFORM=${{ inputs.arch }} ..
+          cmake -DCMAKE_GENERATOR_PLATFORM=${{ (inputs.arch=='x86' && 'Win32') || 'x64' }} ..
 
       - name: Build project
         working-directory: build
