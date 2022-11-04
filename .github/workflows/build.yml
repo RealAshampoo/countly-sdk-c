@@ -8,7 +8,7 @@ on:
 
 jobs:
   prepare_arch_independent:
-    uses: ./.github/workflows/prepare.yml
+    uses: ./.github/workflows/prepare_arch_independent.yml
 
   create_release_asset_x64:
     needs: prepare_arch_independent
