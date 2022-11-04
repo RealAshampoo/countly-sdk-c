@@ -36,7 +36,7 @@ jobs:
           copy Release\countly.lib relarchive
           copy ..\include\countly_c.h relarchive
           cd relarchive
-          Compress-Archive -Path . -DestinationPath ..\countly_x64.zip
+          Compress-Archive -Path . -DestinationPath ..\countly_${{ inputs.arch }}.zip
 
       - name: Upload Release Asset (${{ inputs.arch }})
         id: upload-release-asset
