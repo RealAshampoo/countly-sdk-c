@@ -8,7 +8,7 @@ on:
 
 jobs:
   create_github_release:
-    name: Create Release:
+    name: Create Github Release
     id: create_release
     uses: actions/create-release@latest
     env:
