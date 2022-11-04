@@ -2,7 +2,9 @@ name: Workflow for general preparation
 on:
   workflow_call:
     outputs:
-      release_upload_url: ${{ jobs.prepare_arch_independent.outputs.release_upload_url }}
+      release_upload_url:
+        description: Upload URL for Github release
+        value: ${{ jobs.prepare_arch_independent.outputs.release_upload_url }}
   
 
 jobs:
