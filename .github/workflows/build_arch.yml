@@ -1,4 +1,4 @@
-name: Countly C SDK Build Workflow for a single architecture
+name: Workflow to build assets for a single architecture
 on:
   workflow_call:
     inputs:

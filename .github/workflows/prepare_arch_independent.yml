@@ -1,4 +1,4 @@
-name: Countly C SDK Build Workflow for a single architecture
+name: Workflow for general preparation
 on:
   workflow_call:
   
