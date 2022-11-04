@@ -7,28 +7,17 @@ on:
 
 
 jobs:
-  create_github_release:
-    name: Create Github Release
-    id: create_release
-    uses: actions/create-release@latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    with:
-      tag_name: ${{ github.ref }}
-      release_name: Release ${{ github.ref }}
-      body: |
-        Automated Release by GitHub Action CI
-      draft: false
-      prerelease: true
+  prepare_arch_independent:
+    uses: ./.github/workflows/prepare.yml
 
   create_release_asset_x64:
-    needs: create_github_release
+    needs: prepare_arch_independent
     uses: ./.github/workflows/build_arch.yml
     with:
       arch: x64
 
   create_release_asset_x86:
-    needs: create_github_release
+    needs: prepare_arch_independent
     uses: ./.github/workflows/build_arch.yml
     with:
       arch: x86

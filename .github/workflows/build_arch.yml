@@ -8,7 +8,7 @@ on:
 
 jobs:
   create_arch_release:
-    name: Create GitHub Release ${{ inputs.arch }}
+    name: Create Release Asset for ${{ inputs.arch }}
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
