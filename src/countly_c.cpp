@@ -9,9 +9,56 @@
 
 #include <countly_c.h>
 
+#undef ERROR
+
+CountlyLogLevel mapCountlyLogLevel(Countly::LogLevel level) {
+	switch(level) {
+	case Countly::LogLevel::DEBUG:		return CountlyLogLevelDebug;
+	case Countly::LogLevel::INFO:		return CountlyLogLevelInfo;
+	case Countly::LogLevel::WARNING:	return CountlyLogLevelWarning;
+	case Countly::LogLevel::ERROR:		return CountlyLogLevelError;
+	case Countly::LogLevel::FATAL:		return CountlyLogLevelFatal;
+	default:				return CountlyLogLevelInfo;
+	}
+}
+
+
+
+struct CountlyCContext {
+	std::string serverHost;
+	int 	    serverPort=0;
+	std::string appKey;
+
+	bool	    started=false;
+
+	countly_log_function_t logFunction = nullptr;
+
+	static CountlyCContext& get() {
+		static CountlyCContext context;
+		return context;
+	}
+};
+
+/** Default function to relay internal Countly log messages to
+ *  the user specific logging function
+ */
+void onCountlyLog(Countly::LogLevel level, const std::string& message) {
+	countly_log_function_t logFunction = CountlyCContext::get().logFunction;
+	if (logFunction != nullptr) {
+		logFunction(mapCountlyLogLevel(level), message.c_str());
+	}
+}
+
 void onException(std::exception& e) {
-	std::cerr << std::endl << "Countly internal exception: " << e.what() << std::endl;
-	std::cerr.flush();
+	std::string logMessage = std::string("Countly internal exception: ") + e.what();
+	countly_log_function_t logFunction = CountlyCContext::get().logFunction;
+	if (logFunction != nullptr) {
+		logFunction(CountlyLogLevelError, logMessage.c_str());
+	}
+	else {
+		std::cerr << std::endl << logMessage << std::endl;
+		std::cerr.flush();
+	}
 }
 
 
@@ -23,19 +70,6 @@ void onException(std::exception& e) {
 	} \
 	return COUNTLY_C_OK;
 
-
-struct CountlyCContext {
-	std::string serverHost;
-	int 	    serverPort=0;
-	std::string appKey;
-
-	bool	    started=false;
-
-	static CountlyCContext& get() {
-		static CountlyCContext context;
-		return context;
-	}
-};
 
 
 
@@ -50,6 +84,7 @@ extern "C" int countly_c_init(
 
 	Countly& ct = Countly::getInstance();
 
+	ct.setLogger(onCountlyLog);
 	ct.SetMaxEventsPerMessage(40);
 	ct.SetPath(stateFilePath);
 
@@ -192,6 +227,15 @@ extern "C" int countly_c_end() {
 	COUNTLY_C_GUARD_BEGIN
 
 	Countly::getInstance().stop();
+
+	COUNTLY_C_GUARD_END
+}
+
+
+extern "C" int countly_c_setLogFunction(countly_log_function_t logFunction) {
+	COUNTLY_C_GUARD_BEGIN
+
+	CountlyCContext::get().logFunction = logFunction;
 
 	COUNTLY_C_GUARD_END
 }

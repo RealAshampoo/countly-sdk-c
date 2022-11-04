@@ -7,5 +7,5 @@ EXPORTS
 	countly_c_recordEvent
 	countly_c_recordScreenView
 	countly_c_flush
-
+	countly_c_setLogFunction
 

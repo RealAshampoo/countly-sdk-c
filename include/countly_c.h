@@ -97,6 +97,26 @@ int countly_c_flush();
 int countly_c_end();
 
 
+/** All possible logging levels, corresponding to the internal Countly class logging levels */
+enum CountlyLogLevel
+{
+	CountlyLogLevelDebug=0,
+	CountlyLogLevelInfo=1,
+	CountlyLogLevelWarning=2,
+	CountlyLogLevelError=3,
+	CountlyLogLevelFatal=4
+};
+
+/** Logging function prototype, to be passed to countly_c_setLogFunction
+  \param level log level
+  \param message text to log
+ */
+typedef void (*countly_log_function_t)(CountlyLogLevel level, const char* message);
+
+/** Sets the logging function for all log levels */
+int countly_c_setLogFunction(countly_log_function_t logFunction);
+
+
 #ifdef __cplusplus
 }
 #endif
