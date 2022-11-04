@@ -7,12 +7,28 @@ on:
 
 
 jobs:
-  create_release_x64:
+  create_github_release:
+    name: Create Release:
+    id: create_release
+    uses: actions/create-release@latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      tag_name: ${{ github.ref }}
+      release_name: Release ${{ github.ref }}
+      body: |
+        Automated Release by GitHub Action CI
+      draft: false
+      prerelease: true
+
+  create_release_asset_x64:
+    needs: create_github_release
     uses: ./.github/workflows/build_arch.yml
     with:
       arch: x64
 
-  create_release_x86:
+  create_release_asset_x86:
+    needs: create_github_release
     uses: ./.github/workflows/build_arch.yml
     with:
       arch: x86
