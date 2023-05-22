@@ -100,10 +100,74 @@ extern "C" int countly_c_init(
 
 	::GetVersionEx((OSVERSIONINFO*)&info);
 
+	int major = info.dwMajorVersion;
+	int minor = info.dwMinorVersion;
+
+	if(major>6 || (major==6 && minor>=2) )
+	{
+		// From Windows 8 on upwards GetVersionEx will only report the version number from
+		// Windows 8, unless a higher Windows version is explicitly marked as supported
+		// in the app's manifest.
+
+		// There is actually a way to find the correct version number.
+		// One can look at the DLL version of the kernel32.dll. So we do that
+		// to get an accurate version number.
+		DWORD dummy=0;
+		DWORD size = ::GetFileVersionInfoSize(L"kernel32.dll", &dummy);
+		if(size>0)
+		{
+			LPVOID vData = malloc(size+100);
+			if (vData == nullptr)
+				return;
+
+			if(::GetFileVersionInfo(L"kernel32.dll", 0, size+100, vData))
+			{
+				VS_FIXEDFILEINFO*	pFileInfo=NULL;
+				UINT			sizeFileInfo=0;
+
+				if(::VerQueryValue(	vData,
+							L"\\",
+							(LPVOID*)&pFileInfo,
+							&sizeFileInfo))
+				{
+					if(pFileInfo!=NULL && sizeFileInfo>=sizeof(VS_FIXEDFILEINFO))
+					{
+						int kernelMajor = pFileInfo->dwProductVersionMS >> 16;
+						int kernelMinor = pFileInfo->dwProductVersionMS & 0xffff;
+
+						if (kernelMajor == 10 && kernelMinor == 0)
+						{
+							// We need to check the build number of the file version to
+							// identify Win11 RC (i.e. 10.0.22000 = Windows 11).
+							int kernelBuildNumber = pFileInfo->dwFileVersionLS >> 16;
+							if (kernelBuildNumber >= 22000)
+							{
+								kernelMajor = 11;
+								kernelMinor = 0;
+							}
+						}
+
+						// we should get a version that is > than the one we got from
+						// GetVersionEx. If we do get that then we assume that this
+						// is the correct OS version.
+						if(kernelMajor>major
+							|| (kernelMajor==major && kernelMinor>minor))
+						{
+							major = kernelMajor;
+							minor = kernelMinor;
+						}
+					}
+				}
+			}
+
+			free(vData);
+		}
+	}
+
 	std::string os;
 
 	std::stringstream osVersionStream;
-	osVersionStream << info.dwMajorVersion << "." << info.dwMinorVersion;
+	osVersionStream << major << "." << minor;
 	std::string osVersion = osVersionStream.str();
 
 	std::stringstream resolutionStream;
