@@ -113,20 +113,18 @@ extern "C" int countly_c_init(
 		// One can look at the DLL version of the kernel32.dll. So we do that
 		// to get an accurate version number.
 		DWORD dummy=0;
-		DWORD size = ::GetFileVersionInfoSize(L"kernel32.dll", &dummy);
+		DWORD size = ::GetFileVersionInfoSize("kernel32.dll", &dummy);
 		if(size>0)
 		{
-			LPVOID vData = malloc(size+100);
-			if (vData == nullptr)
-				return;
+			std::unique_ptr<uint8_t> data( new uint8_t[size+100]);
 
-			if(::GetFileVersionInfo(L"kernel32.dll", 0, size+100, vData))
+			if(::GetFileVersionInfo("kernel32.dll", 0, size+100, data.get()))
 			{
 				VS_FIXEDFILEINFO*	pFileInfo=NULL;
 				UINT			sizeFileInfo=0;
 
-				if(::VerQueryValue(	vData,
-							L"\\",
+				if(::VerQueryValue(	data.get(),
+							"\\",
 							(LPVOID*)&pFileInfo,
 							&sizeFileInfo))
 				{
@@ -159,8 +157,6 @@ extern "C" int countly_c_init(
 					}
 				}
 			}
-
-			free(vData);
 		}
 	}
 

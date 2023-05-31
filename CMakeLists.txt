@@ -39,7 +39,7 @@ set_target_properties(countly PROPERTIES
     CXX_EXTENSIONS NO)
 
 find_package(Threads)
-target_link_libraries(countly Threads::Threads)
+target_link_libraries(countly Threads::Threads version)
 
 target_include_directories(countly PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/json/include)
 
