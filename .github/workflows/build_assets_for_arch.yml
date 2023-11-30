@@ -34,6 +34,7 @@ jobs:
           mkdir relarchive
           copy Release\countly.dll relarchive
           copy Release\countly.lib relarchive
+          copy Release\countly.pdb relarchive
           copy ..\include\countly_c.h relarchive
           cd relarchive
           Compress-Archive -Path . -DestinationPath ..\countly_${{ inputs.arch }}.zip

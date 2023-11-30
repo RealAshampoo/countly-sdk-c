@@ -19,6 +19,13 @@ endif()
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS off)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  add_compile_options("$<$<NOT:$<CONFIG:Debug>>:/Zi>")
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/DEBUG>")
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/OPT:REF>")
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/OPT:ICF>")
+endif()
+
 add_library(countly
   ${CMAKE_CURRENT_SOURCE_DIR}/src/countly.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/event.cpp
