@@ -789,7 +789,6 @@ void Countly::setDatabasePath(const std::string& path) {
 		}
 	} else {
 		log(Countly::LogLevel::ERROR, "Failed to open sqlite database");
-		sqlite3_free(error_message);
 		database_path.clear();
 	}
 	sqlite3_close(database);
